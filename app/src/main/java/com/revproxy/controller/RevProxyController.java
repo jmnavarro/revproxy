@@ -7,16 +7,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Optional;
+
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("**")
@@ -28,10 +28,9 @@ public class RevProxyController {
     private final ProxyService proxyService;
 
     @GetMapping
-    public ResponseEntity<Object> get(@NonNull HttpServletRequest request,
-                                      @NonNull @RequestParam Map<String, String> params,
-                                      @NonNull @RequestHeader Map<String, String> headers,
-                                      @RequestBody(required = false) Object body) {
+    public Mono<ResponseEntity<Object>> get(@NonNull @RequestParam Map<String, String> params,
+                                            @NonNull @RequestHeader Map<String, String> headers,
+                                            @RequestBody(required = false) Object body) {
         // There's some literature around the semantics of the body in GET requests.
         // Supporting body in this context doesn't do any harm, while it makes the server more
         // flexible, so it seems to be a good idea to support it.
