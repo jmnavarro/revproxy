@@ -12,9 +12,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProxyServiceImpl implements ProxyService {
 
+    @NonNull
+    private final DestinationService destinationService;
+
+    @NonNull
+    private final ProxySender sender;
+
     @Override
-    public Optional<ProxyResponse> send(@NonNull ProxyRequest req) {
-        //TODO
-        return Optional.empty();
+    public Optional<ProxyResponse> send(@NonNull ProxyRequest request) {
+        return Optional.ofNullable(request.headers().get("host"))
+                        .flatMap(destinationService::getDestination)
+                        .map(destination -> sender.send(destination, request));
     }
 }
