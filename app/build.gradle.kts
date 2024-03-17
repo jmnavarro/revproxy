@@ -18,13 +18,19 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // Use event-based (with webflux) instead of thread-based.
+    //
+    // Since the workload will be mainly IO, an event-based server fits better than a threaded one.
+    //
+    // The main reason is that a threaded server requires an open thread during the complete lifetime
+    // of each request, leading to higher resources consumption and less scalability.
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-    // This dependency is used by the application.
-    implementation(libs.guava)
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.projectreactor:reactor-test")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
