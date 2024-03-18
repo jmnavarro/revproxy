@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
@@ -48,7 +49,11 @@ public class DestinationServiceImpl implements DestinationService{
 
     @Override
     public Optional<ProxyDestination> getDestination(String origin) {
-        return Optional.ofNullable(destinations.get(origin));
+        final var parts = origin.split(":");
+        if (parts.length > 0) {
+            return Optional.ofNullable(destinations.get(parts[0]));
+        }
+        return Optional.empty();
     }
 
     private static String getResourceAsString(@NonNull Resource resource) {
