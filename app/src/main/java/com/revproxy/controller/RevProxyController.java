@@ -1,6 +1,8 @@
 package com.revproxy.controller;
 
+import com.revproxy.context.ReactiveRequestContextHolder;
 import com.revproxy.model.ProxyRequest;
+import com.revproxy.model.ProxyResponse;
 import com.revproxy.service.ProxyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,28 +36,17 @@ public class RevProxyController {
         // There's some literature around the semantics of the body in GET requests.
         // Supporting body in this context doesn't do any harm, while it makes the server more
         // flexible, so it seems to be a good idea to support it.
-        getPath(getURL(request))
-                .map(path -> new ProxyRequest(HttpMethod.GET, request.getScheme(), path, params, headers, Optional.of(body)))
-                .flatMap(proxyService::send);
-        String message = "Hello, World!";
-        return new ResponseEntity<>(message, HttpStatus.OK);
+        return ReactiveRequestContextHolder.getRequest()
+                .map(ServerHttpRequest::getURI)
+                .map(path -> new ProxyRequest(HttpMethod.GET, path.getScheme(), path.getPath(), params, headers, Optional.of(body)))
+                .flatMap(proxyService::send)
+                .map(this::processResult);
     }
 
-    @NonNull
-    private String getURL(@NonNull HttpServletRequest request){
-        return ServletUriComponentsBuilder.fromRequestUri(request)
-                .build()
-                .toUriString();
+    private ResponseEntity<Object> processResult(@NonNull ProxyResponse result) {
+        return ResponseEntity.status(result.status())
+                .headers(headers ->  Optional.of(result.headers()).ifPresent(resultHeaders -> resultHeaders.forEach(headers::set)))
+                .body(result.body());
     }
-
-    private Optional<String> getPath(@NonNull String url) {
-        try {
-            return Optional.ofNullable(new URI(url).getPath());
-        } catch (URISyntaxException e) {
-            log.error(e.getLocalizedMessage(), e);
-        }
-        return Optional.empty();
-    }
-
 
 }
