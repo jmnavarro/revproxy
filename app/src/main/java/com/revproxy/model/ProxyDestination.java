@@ -7,6 +7,6 @@ import org.springframework.lang.Nullable;
 import java.util.Map;
 
 @Builder
-public record ProxyDestination(@NonNull String from, @NonNull String to, @Nullable Map<String, String> additionalHeaders, @Nullable Map<String, String> additionalParams) {
+public record ProxyDestination(@NonNull String from, @NonNull String to, @NonNull String loadBalancing, @Nullable Map<String, String> additionalHeaders, @Nullable Map<String, String> additionalParams) {
 
 }
