@@ -8,7 +8,7 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class LoadBalancerStrategyServiceImpl implements LoadBalancerStrategyService {
+public class LoadBalancerServiceImpl implements LoadBalancerService {
 
     @Override
     public ProxyDestination chooseDestination(List<ProxyDestination> destinations) {

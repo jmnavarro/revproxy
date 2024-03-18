@@ -4,6 +4,6 @@ import com.revproxy.model.ProxyDestination;
 
 import java.util.List;
 
-public interface LoadBalancerStrategyService {
+public interface LoadBalancerService {
     ProxyDestination chooseDestination(List<ProxyDestination> destinations);
 }

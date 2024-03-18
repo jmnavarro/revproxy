@@ -18,7 +18,7 @@ public class ProxyServiceImpl implements ProxyService {
     private final DestinationService destinationService;
 
     @NonNull
-    private final LoadBalancerStrategyService loadBalancerStrategyService;
+    private final LoadBalancerService loadBalancerService;
 
     @NonNull
     private final ProxySender sender;
@@ -27,7 +27,7 @@ public class ProxyServiceImpl implements ProxyService {
     public Mono<ProxyResponse> send(@NonNull ProxyRequest request) {
         return Optional.ofNullable(request.headers().get("host"))
                         .map(destinationService::getDestinations)
-                        .map(loadBalancerStrategyService::chooseDestination)
+                        .map(loadBalancerService::chooseDestination)
                         .map(destination -> sender.send(destination, request))
                         .orElse(Mono.just(
                                     ProxyResponse.builder()
