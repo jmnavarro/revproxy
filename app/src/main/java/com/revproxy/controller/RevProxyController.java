@@ -34,9 +34,6 @@ public class RevProxyController {
     @GetMapping
     public Mono<ResponseEntity<Object>> get(@NonNull @RequestParam Map<String, String> params,
                                             @NonNull @RequestHeader Map<String, String> headers) {
-        // There's some literature around the semantics of the body in GET requests.
-        // Supporting body in this context doesn't do any harm, while it makes the server more
-        // flexible, so it seems to be a good idea to support it.
         return handleRequest(HttpMethod.GET, params, headers, Optional.empty());
     }
 
