@@ -1,0 +1,10 @@
+[
+    {
+        "from": "127.0.0.1",
+        "to": "google.com"
+    },
+    {
+        "from": "localhost",
+        "to": "https://placebear.com/200/300"
+    }
+]
