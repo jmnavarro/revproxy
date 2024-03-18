@@ -18,7 +18,6 @@ public class DestinationServiceImpl implements DestinationService{
         this.load();
     }
 
-
     private void load() {
         //TODO
     }
