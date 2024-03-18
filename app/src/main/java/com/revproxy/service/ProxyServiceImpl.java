@@ -5,6 +5,7 @@ import com.revproxy.model.ProxyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
@@ -19,9 +20,9 @@ public class ProxyServiceImpl implements ProxyService {
     private final ProxySender sender;
 
     @Override
-    public Optional<ProxyResponse> send(@NonNull ProxyRequest request) {
+    public Mono<ProxyResponse> send(@NonNull ProxyRequest request) {
         return Optional.ofNullable(request.headers().get("host"))
                         .flatMap(destinationService::getDestination)
-                        .map(destination -> sender.send(destination, request));
+                        .map(destination -> sender.send(destination, request)).get();
     }
 }
