@@ -3,15 +3,13 @@ package com.revproxy.service;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.revproxy.model.ProxyDestination;
+import com.revproxy.model.ProxyOrigin;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.NonNull;
@@ -19,41 +17,44 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
 public class DestinationServiceImpl implements DestinationService{
 
+    private static final String RULES_FILE = "rules.json";
+
     @NonNull
-    private final ResourceLoader resourceLoader;
-    @NonNull
-    private final Map<String, ProxyDestination> destinations = new HashMap<>();
+    private final Map<String, List<ProxyDestination>> destinations;
 
     public DestinationServiceImpl(@NonNull ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-        this.load();
-    }
-
-    private void load() {
-        Optional.of(resourceLoader.getResource("classpath:destinations.json"))
+        this.destinations = Optional.of(resourceLoader.getResource("classpath:" + RULES_FILE))
                 .map(DestinationServiceImpl::getResourceAsString)
-                .ifPresentOrElse(fileData -> {
-                    final var typeToken = new TypeToken<List<ProxyDestination>>() {};
-                    final List<ProxyDestination> list = new Gson().fromJson(fileData, typeToken.getType());
-                    list.forEach(d -> destinations.put(d.from(), d));
-                    log.info("Destinations loaded");
-                }, () -> log.warn("No destinations file found"));
-    }
+                .map(fileData -> {
+                    final var typeToken = new TypeToken<List<ProxyOrigin>>() {};
+                    final List<ProxyOrigin> origins = new Gson().fromJson(fileData, typeToken.getType());
+                    return origins
+                            .stream()
+                            .map(ProxyOrigin::getDestinations)
+                            .flatMap(Collection::stream)
+                            .collect(Collectors.groupingBy(ProxyDestination::from));
+                }).orElse(Collections.emptyMap());
 
+        if (this.destinations.isEmpty()) {
+            log.warn("No origins found in the configuration file");
+        } else {
+            log.info(destinations.size() + " origins found in the configuration file");
+        }
+    }
 
     @Override
-    public Optional<ProxyDestination> getDestination(String origin) {
+    public List<ProxyDestination> getDestinations(String origin) {
         final var parts = origin.split(":");
         if (parts.length > 0) {
-            return Optional.ofNullable(destinations.get(parts[0]));
+            return destinations.get(parts[0]);
         }
-        return Optional.empty();
+
+        return Collections.emptyList();
     }
 
     private static String getResourceAsString(@NonNull Resource resource) {

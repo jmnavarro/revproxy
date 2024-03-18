@@ -18,12 +18,16 @@ public class ProxyServiceImpl implements ProxyService {
     private final DestinationService destinationService;
 
     @NonNull
+    private final LoadBalancerStrategyService loadBalancerStrategyService;
+
+    @NonNull
     private final ProxySender sender;
 
     @Override
     public Mono<ProxyResponse> send(@NonNull ProxyRequest request) {
         return Optional.ofNullable(request.headers().get("host"))
-                        .flatMap(destinationService::getDestination)
+                        .map(destinationService::getDestinations)
+                        .map(loadBalancerStrategyService::chooseDestination)
                         .map(destination -> sender.send(destination, request))
                         .orElse(Mono.just(
                                     ProxyResponse.builder()
