@@ -1,6 +1,7 @@
 package com.revproxy.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.revproxy.model.loadbalancers.AbstractLoadBalancer;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;

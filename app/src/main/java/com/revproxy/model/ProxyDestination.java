@@ -1,5 +1,6 @@
 package com.revproxy.model;
 
+import com.revproxy.model.loadbalancers.AbstractLoadBalancer;
 import lombok.Builder;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;

@@ -1,4 +1,7 @@
-package com.revproxy.model;
+package com.revproxy.model.loadbalancers;
+
+import com.revproxy.model.ProxyDestination;
+import com.revproxy.model.loadbalancers.AbstractLoadBalancer;
 
 import java.util.List;
 import java.util.Random;

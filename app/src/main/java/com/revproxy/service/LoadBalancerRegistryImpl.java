@@ -1,7 +1,7 @@
 package com.revproxy.service;
 
-import com.revproxy.model.AbstractLoadBalancer;
-import com.revproxy.model.RandomLoadBalancer;
+import com.revproxy.model.loadbalancers.AbstractLoadBalancer;
+import com.revproxy.model.loadbalancers.RandomLoadBalancer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
