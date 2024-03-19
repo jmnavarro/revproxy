@@ -35,7 +35,8 @@ public class ProxySenderImpl implements ProxySender {
     public Mono<ProxyResponse> send(@NonNull ProxyDestination destination, @NonNull ProxyRequest request) {
         // Build the URL
         final var url = buildURL(request, destination);
-        log.info("Forwarding request to " + url);
+
+        LoggingRequestFilter.printLog(String.format("Forward %s://%s%s to %s", request.scheme(), request.getHost(), request.path(), url), false);
 
         // Send the Request
         final var requestBuilder = webClient.method(request.method())
