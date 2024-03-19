@@ -49,12 +49,8 @@ public class DestinationServiceImpl implements DestinationService{
 
     @Override
     public List<ProxyDestination> getDestinations(String origin) {
-        final var parts = origin.split(":");
-        if (parts.length > 0) {
-            return destinations.get(parts[0]);
-        }
-
-        return Collections.emptyList();
+        var match = destinations.get(extractHost(origin));
+        return (match != null) ? match : Collections.emptyList();
     }
 
     private static String getResourceAsString(@NonNull Resource resource) {
@@ -64,6 +60,11 @@ public class DestinationServiceImpl implements DestinationService{
             log.error(e.getLocalizedMessage(), e);
         }
         return null;
+    }
+
+    private static String extractHost(String hostWithPort) {
+        final var parts = hostWithPort.split(":");
+        return (parts.length > 0) ? parts[0] : hostWithPort;
     }
 
 }
