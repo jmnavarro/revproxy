@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 import java.net.URI;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @Slf4j
@@ -49,8 +51,8 @@ public class ProxySenderImpl implements ProxySender {
         return requestBuilder.retrieve()
                 .toEntity(Resource.class)
                 .timeout(Duration.ofSeconds(destination.timeout()))
+                .retryWhen(Retry.max(destination.maxRetries()))
                 .onErrorReturn(new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT))
-                .retry(destination.maxRetries())
                 .map(entity -> ProxyResponse.builder()
                         .status(entity.getStatusCode().value())
                         .headers(entity.getHeaders().toSingleValueMap())

@@ -22,7 +22,7 @@ public class LoggingRequestFilter implements WebFilter {
 
     private static final String START_REQUEST_FORMAT = "Request: %s, [%s %s]";
     private static final String END_REQUEST_FORMAT = "Request %s completed (%d ms)";
-    private static final String ERROR_REQUEST_FORMAT = "Request %s failed (%d ms)";
+    private static final String ERROR_REQUEST_FORMAT = "Request %s failed with status %d (%d ms)";
 
     public static void printLog(String str, boolean error) {
         String msg = String.format("[%s] %s", DATE_FORMATER.format(new Date(Instant.now().toEpochMilli())), str);
@@ -43,7 +43,12 @@ public class LoggingRequestFilter implements WebFilter {
                 .doOnSuccess(aVoid -> {
                     final long endTime = Instant.now().toEpochMilli();
                     final long duration = endTime - startTime;
-                    printLog(String.format(END_REQUEST_FORMAT, request.getId(), duration), false);
+                    final var status = exchange.getResponse().getStatusCode();
+                    if (status != null && status.is2xxSuccessful()) {
+                        printLog(String.format(END_REQUEST_FORMAT, request.getId(), duration), false);
+                    } else {
+                        printLog(String.format(ERROR_REQUEST_FORMAT, request.getId(), status.value(), duration), true);
+                    }
                 })
                 .doOnError(error -> {
                     final long endTime = Instant.now().toEpochMilli();
