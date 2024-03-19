@@ -3,6 +3,7 @@ package com.revproxy.service;
 import com.revproxy.model.ProxyDestination;
 import com.revproxy.model.ProxyRequest;
 import com.revproxy.model.ProxyResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class ProxySenderImpl implements ProxySender {
 
     private final WebClient webClient;
@@ -31,6 +33,8 @@ public class ProxySenderImpl implements ProxySender {
     public Mono<ProxyResponse> send(@NonNull ProxyDestination destination, @NonNull ProxyRequest request) {
         // Build the URL
         final var url = buildURL(request, destination);
+        log.info("Forwarding request to " + url);
+
         // Send the Request
         final var requestBuilder = webClient.method(request.method())
                 .uri(url)
