@@ -13,6 +13,9 @@ import java.util.Map;
 @Setter
 @Getter
 public class ProxyRule {
+
+    private static final int DEFAULT_TIMEOUT_SECONDS = 5;
+
     @NonNull
     String from;
 
@@ -32,6 +35,9 @@ public class ProxyRule {
     @Nullable
     Map<String, String> additionalParams;
 
+    @Nullable
+    Integer timeout;  // in seconds
+
     public List<ProxyDestination> getDestinations() {
         return this.to.stream().map(
                 toUrl -> ProxyDestination.builder()
@@ -41,6 +47,7 @@ public class ProxyRule {
                         .loadBalancer(this.loadBalancer)
                         .additionalHeaders(this.additionalHeaders)
                         .additionalParams(this.additionalParams)
+                        .timeout(this.timeout == null ? DEFAULT_TIMEOUT_SECONDS : this.timeout)
                         .build()
                 ).toList();
     }

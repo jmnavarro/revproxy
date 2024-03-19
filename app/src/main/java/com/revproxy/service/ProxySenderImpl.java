@@ -6,14 +6,16 @@ import com.revproxy.model.ProxyResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,6 +46,8 @@ public class ProxySenderImpl implements ProxySender {
 
         return requestBuilder.retrieve()
                 .toEntity(Resource.class)
+                .timeout(Duration.ofSeconds(destination.timeout()))
+                .onErrorReturn(new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT))
                 .map(entity -> ProxyResponse.builder()
                         .status(entity.getStatusCode().value())
                         .headers(entity.getHeaders().toSingleValueMap())

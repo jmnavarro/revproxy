@@ -9,10 +9,12 @@
     {
         "from": "localhost",
         "to": [
+            "https://placebear.com/1000/1000",
             "https://placebear.com/200/300",
             "https://placebear.com/500/500",
             "https://placebear.com/100/500"
         ],
-        "load-balancing": "round-robin"
+        "load-balancing": "round-robin",
+        "timeout": 1
     }
 ]

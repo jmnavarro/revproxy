@@ -24,6 +24,10 @@ public record ProxyDestination(
         @Nullable
         Map<String, String> additionalHeaders,
 
-        @Nullable Map<String, String> additionalParams) {
+        @Nullable
+        Map<String, String> additionalParams,
 
+        @Nullable
+        int timeout   // in seconds
+) {
 }
