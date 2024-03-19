@@ -1,13 +1,24 @@
 package com.revproxy.model;
 
+import com.google.gson.annotations.SerializedName;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public record ProxyOrigin(@NonNull String from, @NonNull List<String> to, @NonNull String loadBalancing, @Nullable Map<String, String> additionalHeaders, @Nullable Map<String, String> additionalParams) {
+public record ProxyRule(
+        @NonNull
+        String from,
+        @NonNull
+        List<String> to,
+        @NonNull
+        @SerializedName("load-balancing")
+        String loadBalancing,
+        @Nullable
+        Map<String, String> additionalHeaders,
+        @Nullable
+        Map<String, String> additionalParams) {
 
     public List<ProxyDestination> getDestinations() {
         return this.to.stream().map(

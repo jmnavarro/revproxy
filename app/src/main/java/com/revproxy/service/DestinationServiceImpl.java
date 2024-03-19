@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.revproxy.model.ProxyDestination;
-import com.revproxy.model.ProxyOrigin;
+import com.revproxy.model.ProxyRule;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.NonNull;
@@ -31,11 +31,11 @@ public class DestinationServiceImpl implements DestinationService{
         this.destinations = Optional.of(resourceLoader.getResource("classpath:" + RULES_FILE))
                 .map(DestinationServiceImpl::getResourceAsString)
                 .map(fileData -> {
-                    final var typeToken = new TypeToken<List<ProxyOrigin>>() {};
-                    final List<ProxyOrigin> origins = new Gson().fromJson(fileData, typeToken.getType());
+                    final var typeToken = new TypeToken<List<ProxyRule>>() {};
+                    final List<ProxyRule> origins = new Gson().fromJson(fileData, typeToken.getType());
                     return origins
                             .stream()
-                            .map(ProxyOrigin::getDestinations)
+                            .map(ProxyRule::getDestinations)
                             .flatMap(Collection::stream)
                             .collect(Collectors.groupingBy(ProxyDestination::from));
                 }).orElse(Collections.emptyMap());
