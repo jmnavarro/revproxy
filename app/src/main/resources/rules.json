@@ -13,6 +13,6 @@
             "https://placebear.com/500/500",
             "https://placebear.com/100/500"
         ],
-        "load-balancing": "random"
+        "load-balancing": "round-robin"
     }
 ]

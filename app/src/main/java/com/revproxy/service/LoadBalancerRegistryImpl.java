@@ -2,6 +2,7 @@ package com.revproxy.service;
 
 import com.revproxy.model.loadbalancers.AbstractLoadBalancer;
 import com.revproxy.model.loadbalancers.RandomLoadBalancer;
+import com.revproxy.model.loadbalancers.RoundRobinLoadBalancer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class LoadBalancerRegistryImpl implements LoadBalancerRegistry {
     public LoadBalancerRegistryImpl() {
         strategies = new HashMap<>();
         strategies.put(RandomLoadBalancer.NAME, RandomLoadBalancer.class);
+        strategies.put(RoundRobinLoadBalancer.NAME, RoundRobinLoadBalancer.class);
     }
 
     @Override
