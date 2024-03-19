@@ -38,6 +38,10 @@ public class ProxyRule {
     @Nullable
     Integer timeout;  // in seconds
 
+    @Nullable
+    @SerializedName("max-retries")
+    Integer maxRetries;
+
     public List<ProxyDestination> getDestinations() {
         return this.to.stream().map(
                 toUrl -> ProxyDestination.builder()
@@ -48,6 +52,7 @@ public class ProxyRule {
                         .additionalHeaders(this.additionalHeaders)
                         .additionalParams(this.additionalParams)
                         .timeout(this.timeout == null ? DEFAULT_TIMEOUT_SECONDS : this.timeout)
+                        .maxRetries(this.maxRetries == null ? 0 : this.maxRetries)
                         .build()
                 ).toList();
     }

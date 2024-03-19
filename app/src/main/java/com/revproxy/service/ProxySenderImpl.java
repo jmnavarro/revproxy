@@ -1,5 +1,6 @@
 package com.revproxy.service;
 
+import com.revproxy.interceptor.LoggingRequestFilter;
 import com.revproxy.model.ProxyDestination;
 import com.revproxy.model.ProxyRequest;
 import com.revproxy.model.ProxyResponse;
@@ -49,6 +50,7 @@ public class ProxySenderImpl implements ProxySender {
                 .toEntity(Resource.class)
                 .timeout(Duration.ofSeconds(destination.timeout()))
                 .onErrorReturn(new ResponseEntity<>(HttpStatus.GATEWAY_TIMEOUT))
+                .retry(destination.maxRetries())
                 .map(entity -> ProxyResponse.builder()
                         .status(entity.getStatusCode().value())
                         .headers(entity.getHeaders().toSingleValueMap())
@@ -59,10 +61,11 @@ public class ProxySenderImpl implements ProxySender {
     @NonNull
     private URI buildURL(@NonNull ProxyRequest request, @NonNull ProxyDestination destination) {
         // Build the URL From the Proxy Destination and Request Path
-        final var builder = UriComponentsBuilder.newInstance();
-        builder.scheme(getScheme(request, destination));
-        builder.host(getHost(destination));
-        builder.path(getPath(request, destination));
+        final var builder = UriComponentsBuilder.newInstance()
+                .scheme(getScheme(request, destination))
+                .host(getHost(destination))
+                .port(getPort(destination))
+                .path(getPath(request, destination));
         // Add Request Query Params
         request.params().forEach(builder::queryParam);
         // Add Destination Query Params, if present
@@ -71,7 +74,6 @@ public class ProxySenderImpl implements ProxySender {
         return builder.build().toUri();
     }
 
-    @SuppressWarnings("null")
     @NonNull
     private String getScheme(@NonNull ProxyRequest request, @NonNull ProxyDestination destination) {
         final var destinationURI = URI.create(destination.to());
@@ -82,7 +84,6 @@ public class ProxySenderImpl implements ProxySender {
         return request.scheme();
     }
 
-    @SuppressWarnings("null")
     @NonNull
     private String getHost(@NonNull ProxyDestination destination) {
         final var host = URI.create(destination.to()).getHost();
@@ -92,7 +93,12 @@ public class ProxySenderImpl implements ProxySender {
         return destination.to();
     }
 
-    @SuppressWarnings("null")
+    @NonNull
+    private int getPort(@NonNull ProxyDestination destination) {
+        final var port = URI.create(destination.to()).getPort();
+        return (port == -1) ? 80 : port;
+    }
+
     @NonNull
     private String getPath(@NonNull ProxyRequest request, @NonNull ProxyDestination destination) {
         final var destinationURI = URI.create(destination.to());

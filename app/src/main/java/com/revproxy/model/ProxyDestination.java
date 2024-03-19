@@ -28,6 +28,9 @@ public record ProxyDestination(
         Map<String, String> additionalParams,
 
         @Nullable
-        int timeout   // in seconds
+        int timeout,   // in seconds
+
+        @Nullable
+        int maxRetries
 ) {
 }
