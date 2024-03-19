@@ -8,6 +8,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,7 +28,11 @@ public class ProxyServiceImpl implements ProxyService {
     public Mono<ProxyResponse> send(@NonNull ProxyRequest request) {
         return Optional.ofNullable(request.headers().get("host"))
                         .map(destinationService::getDestinations)
-                        .map(loadBalancerService::chooseDestination)
+                        .map(destinations -> {
+                            // all load balancer assigned to all destinations are actually references to the same
+                            // we can safely return the first one
+                            return destinations.getFirst().loadBalancer().chooseDestination(destinations);
+                        })
                         .map(destination -> sender.send(destination, request))
                         .orElse(Mono.just(
                                     ProxyResponse.builder()

@@ -1,5 +1,6 @@
 package com.revproxy.service;
 
+import com.revproxy.model.LoadBalancingAbstractStrategy;
 import com.revproxy.model.ProxyDestination;
 
 import java.util.List;
