@@ -23,7 +23,7 @@ public class ProxyRule {
     String loadBalancerName;
 
     @Nullable
-    LoadBalancingAbstractStrategy loadBalancer;
+    AbstractLoadBalancer loadBalancer;
 
     @Nullable
     Map<String, String> additionalHeaders;

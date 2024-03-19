@@ -1,12 +1,12 @@
 package com.revproxy.service;
 
-import com.revproxy.model.LoadBalancingAbstractStrategy;
+import com.revproxy.model.AbstractLoadBalancer;
 import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
 public interface LoadBalancerRegistry {
 
-    Optional<LoadBalancingAbstractStrategy> createLoadBalancer(@NonNull String loadBalancerName);
+    Optional<AbstractLoadBalancer> createLoadBalancer(@NonNull String loadBalancerName);
 
 }

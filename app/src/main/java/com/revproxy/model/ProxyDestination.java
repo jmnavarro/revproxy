@@ -18,7 +18,7 @@ public record ProxyDestination(
         String loadBalancerName,
 
         @NonNull
-        LoadBalancingAbstractStrategy loadBalancer,
+        AbstractLoadBalancer loadBalancer,
 
         @Nullable
         Map<String, String> additionalHeaders,
