@@ -27,7 +27,7 @@ public class DestinationServiceImpl implements DestinationService{
     @NonNull
     private final Map<String, List<ProxyDestination>> destinations;
 
-    public DestinationServiceImpl(@NonNull ResourceLoader resourceLoader, @NonNull LoadBalancerService loadBalancerService) {
+    public DestinationServiceImpl(@NonNull ResourceLoader resourceLoader, @NonNull LoadBalancerRegistry loadBalancerRegistry) {
         this.destinations = Optional.of(resourceLoader.getResource("classpath:" + RULES_FILE))
                 .map(DestinationServiceImpl::getResourceAsString)
                 .map(fileData -> {
@@ -36,7 +36,7 @@ public class DestinationServiceImpl implements DestinationService{
                     return origins
                             .stream()
                             .map(rule -> {
-                                loadBalancerService
+                                loadBalancerRegistry
                                         .createLoadBalancer(rule.getLoadBalancerName())
                                         .ifPresent(rule::setLoadBalancer);
                                 return rule;

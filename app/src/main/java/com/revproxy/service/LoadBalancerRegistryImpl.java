@@ -2,7 +2,6 @@ package com.revproxy.service;
 
 import com.revproxy.model.LoadBalancingAbstractStrategy;
 import com.revproxy.model.LoadBalancingRandomStrategy;
-import com.revproxy.model.ProxyDestination;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -12,11 +11,11 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class LoadBalancerServiceImpl implements LoadBalancerService {
+public class LoadBalancerRegistryImpl implements LoadBalancerRegistry {
 
     private final Map<String, Class<? extends LoadBalancingAbstractStrategy>> strategies;
 
-    public LoadBalancerServiceImpl() {
+    public LoadBalancerRegistryImpl() {
         strategies = new HashMap<>();
         strategies.put(LoadBalancingRandomStrategy.NAME, LoadBalancingRandomStrategy.class);
     }

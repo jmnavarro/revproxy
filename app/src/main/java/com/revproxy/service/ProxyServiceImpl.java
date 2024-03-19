@@ -8,7 +8,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +18,7 @@ public class ProxyServiceImpl implements ProxyService {
     private final DestinationService destinationService;
 
     @NonNull
-    private final LoadBalancerService loadBalancerService;
+    private final LoadBalancerRegistry loadBalancerRegistry;
 
     @NonNull
     private final ProxySender sender;
