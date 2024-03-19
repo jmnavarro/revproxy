@@ -39,7 +39,9 @@ public class ProxySenderImpl implements ProxySender {
         final var requestBuilder = webClient.method(request.method())
                 .uri(url)
                 .headers(headers -> addHeaders(headers, request, destination));
+
         request.body().ifPresent(requestBuilder::bodyValue);
+
         return requestBuilder.retrieve()
                 .toEntity(Resource.class)
                 .map(entity -> ProxyResponse.builder()
@@ -90,7 +92,7 @@ public class ProxySenderImpl implements ProxySender {
     private String getPath(@NonNull ProxyRequest request, @NonNull ProxyDestination destination) {
         final var destinationURI = URI.create(destination.to());
         final var path = destinationURI.getPath();
-        if (path != null && !path.isEmpty() && !path.equalsIgnoreCase(destination.to())) {
+        if (path != null && !path.isEmpty() && !path.equals(destination.to())) {
             return path;
         }
         return request.path();
@@ -103,7 +105,7 @@ public class ProxySenderImpl implements ProxySender {
 
     private void addHeaders(HttpHeaders headers, Map<String, String> headersToAdd) {
         headersToAdd.forEach((key, value) -> {
-            if (!key.equalsIgnoreCase("host")) {
+            if (!key.equals("host")) {
                 headers.add(key, value);
             }
         });
