@@ -14,7 +14,7 @@ public record ProxyRule(
         List<String> to,
         @NonNull
         @SerializedName("load-balancing")
-        String loadBalancing,
+        String loadBalancerName,
         @Nullable
         Map<String, String> additionalHeaders,
         @Nullable
@@ -25,7 +25,7 @@ public record ProxyRule(
                 toUrl -> ProxyDestination.builder()
                         .from(this.from())
                         .to(toUrl)
-                        .loadBalancing(this.loadBalancing())
+                        .loadBalancerName(this.loadBalancerName())
                         .additionalHeaders(this.additionalHeaders())
                         .additionalParams(this.additionalParams())
                         .build()
