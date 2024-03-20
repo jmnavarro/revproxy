@@ -10,9 +10,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.revproxy.model.ProxyDestination;
 import com.revproxy.model.ProxyRule;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +32,10 @@ public class DestinationServiceImpl implements DestinationService{
     private final Map<String, List<ProxyDestination>> destinations;
 
     public DestinationServiceImpl(@NonNull ResourceLoader resourceLoader, @NonNull LoadBalancerRegistry loadBalancerRegistry) {
-        this.destinations = Optional.of(resourceLoader.getResource("classpath:" + RULES_FILE))
+        var rulesFileName = loadRulesFileName(resourceLoader);
+        String rulesFile = rulesFileName.orElse(RULES_FILE);
+
+        this.destinations = Optional.of(resourceLoader.getResource("classpath:" + rulesFile))
                 .map(DestinationServiceImpl::getResourceAsString)
                 .map(fileData -> {
                     final var typeToken = new TypeToken<List<ProxyRule>>() {};
@@ -47,9 +54,9 @@ public class DestinationServiceImpl implements DestinationService{
                 }).orElse(Collections.emptyMap());
 
         if (this.destinations.isEmpty()) {
-            log.warn("No origins found in the configuration file");
+            log.warn(String.format("[%s] No origins found in the configuration file", rulesFile));
         } else {
-            log.info(destinations.size() + " origins found in the configuration file");
+            log.info(String.format("[%s] %d origins found in the configuration file", rulesFile, destinations.size()));
         }
     }
 
@@ -71,6 +78,17 @@ public class DestinationServiceImpl implements DestinationService{
     private static String extractHost(String hostWithPort) {
         final var parts = hostWithPort.split(":");
         return (parts.length > 0) ? parts[0] : hostWithPort;
+    }
+
+    private Optional<String> loadRulesFileName(@NonNull ResourceLoader resourceLoader) {
+        try {
+            var res = resourceLoader.getResource("classpath:application.properties");
+            Properties p = PropertiesLoaderUtils.loadProperties(res);
+            var obj = p.get("revproxy.rules-file");
+            return obj == null ? Optional.empty() : Optional.of(obj.toString());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
 }
