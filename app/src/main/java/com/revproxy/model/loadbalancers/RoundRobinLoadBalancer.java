@@ -1,6 +1,8 @@
 package com.revproxy.model.loadbalancers;
 
 import com.revproxy.model.ProxyDestination;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -93,12 +95,16 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
         }
     }
 
+    private static final int REQUEST_UNITS = 1;
+    private static final int DESTINATION_TOTAL_UNITS = 3;
 
     private DestinationScheduler scheduler;
     private static final Object CREATION_LOCK = new Object();
 
-    private static final int REQUEST_UNITS = 1;
-    private static final int DESTINATION_TOTAL_UNITS = 3;
+    @Setter @Getter
+    private int requestUnits = REQUEST_UNITS;
+    @Setter @Getter
+    private int destinationTotalUnits =  DESTINATION_TOTAL_UNITS;
 
     @Override
     public ProxyDestination selectDestination(List<ProxyDestination> destinations) {
@@ -116,12 +122,13 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
     }
 
     private DestinationScheduler createScheduler(List<ProxyDestination> destinations) {
-        scheduler = new DestinationScheduler(REQUEST_UNITS);
+        scheduler = new DestinationScheduler(requestUnits);
 
         destinations.stream()
-                .map(d -> new DestinationProcess(d, DESTINATION_TOTAL_UNITS))
+                .map(d -> new DestinationProcess(d, destinationTotalUnits))
                 .forEach(p -> scheduler.addDestinationProcess(p));
 
         return scheduler;
     }
+
 }

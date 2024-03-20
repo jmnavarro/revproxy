@@ -34,7 +34,7 @@ public class ProxyRuleSpecTest {{
         it.should("return same load balancers in all ProxyDestination objects", expect -> {
             var loadBalancer = destinations.getFirst().loadBalancer();
             destinations.forEach(d -> {
-                expect.that(d.loadBalancer()).is(loadBalancer);
+                expect.that(d.loadBalancer()).sameInstance(loadBalancer);
             });
         });
 

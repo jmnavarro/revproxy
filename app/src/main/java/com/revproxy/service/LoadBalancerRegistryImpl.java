@@ -6,6 +6,7 @@ import com.revproxy.model.loadbalancers.RoundRobinLoadBalancer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -24,7 +25,15 @@ public class LoadBalancerRegistryImpl implements LoadBalancerRegistry {
 
     @Override
     public Optional<AbstractLoadBalancer> createLoadBalancer(@NonNull String loadBalancerName) {
+        if (!StringUtils.hasLength(loadBalancerName)) {
+            return Optional.empty();
+        }
+
         var klass = strategies.get(loadBalancerName);
+        if (klass == null) {
+            return Optional.empty();
+        }
+
         try {
             AbstractLoadBalancer instance = klass.getDeclaredConstructor().newInstance();
             return Optional.of(instance);
