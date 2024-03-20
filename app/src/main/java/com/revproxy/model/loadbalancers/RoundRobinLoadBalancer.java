@@ -101,7 +101,7 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
     private static final int DESTINATION_TOTAL_UNITS = 3;
 
     @Override
-    public ProxyDestination chooseDestination(List<ProxyDestination> destinations) {
+    public ProxyDestination selectDestination(List<ProxyDestination> destinations) {
         // This is an undesirable lock, but not a global lock at least.
         // Since each rule has its own load balancer instance, only destinations within same rule will be locked here.
         // Good news is that this lock only occurs once per rule.

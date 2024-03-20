@@ -5,5 +5,5 @@ import com.revproxy.model.ProxyDestination;
 import java.util.List;
 
 public abstract class AbstractLoadBalancer {
-    public abstract ProxyDestination chooseDestination(List<ProxyDestination> destinations);
+    public abstract ProxyDestination selectDestination(List<ProxyDestination> destinations);
 }

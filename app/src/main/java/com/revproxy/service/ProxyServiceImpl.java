@@ -30,7 +30,7 @@ public class ProxyServiceImpl implements ProxyService {
                         .map(destinations -> {
                             // all load balancer assigned to all destinations are actually references to the same
                             // we can safely return the first one
-                            return destinations.getFirst().loadBalancer().chooseDestination(destinations);
+                            return destinations.getFirst().loadBalancer().selectDestination(destinations);
                         })
                         .map(destination -> sender.send(destination, request))
                         .orElse(Mono.just(
