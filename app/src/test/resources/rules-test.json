@@ -1,0 +1,16 @@
+[
+    {
+        "from": "127.0.0.1",
+        "to": [
+            "http://httpbin.org"
+        ],
+        "load-balancing": "random"
+    },
+    {
+        "from": "localhost",
+        "to": [
+            "http://httpbin.org"
+        ],
+        "load-balancing": "round-robin"
+    }
+]
