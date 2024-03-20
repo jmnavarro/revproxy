@@ -2,6 +2,7 @@ package com.revproxy.model;
 
 import com.google.gson.annotations.SerializedName;
 import com.revproxy.model.loadbalancers.AbstractLoadBalancer;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
@@ -12,9 +13,10 @@ import java.util.Map;
 
 @Setter
 @Getter
+@Builder
 public class ProxyRule {
 
-    private static final int DEFAULT_TIMEOUT_SECONDS = 5;
+    public static final int DEFAULT_TIMEOUT_SECONDS = 5;
 
     @NonNull
     String from;

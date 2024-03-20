@@ -33,6 +33,10 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("com.insightfullogic:lambda-behave:0.4")
+
+    // runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.107.Final")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
