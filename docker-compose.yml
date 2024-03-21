@@ -1,0 +1,10 @@
+version: '3.8'
+services: 
+  app:
+    container_name: revproxy
+    build: 
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    ports: 
+      - 8080:8080

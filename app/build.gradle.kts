@@ -46,6 +46,14 @@ java {
     }
 }
 
+tasks.bootJar {
+    archiveFileName.set("revproxy.jar")
+}
+
+tasks.withType<Jar> {
+    destinationDirectory = File("$rootDir/build")
+}
+
 application {
     // Define the main class for the application.
     mainClass = "com.revproxy.RevProxyApplication"
