@@ -11,6 +11,8 @@
         "to": [
             "http://httpbin.org"
         ],
-        "load-balancing": "round-robin"
+        "load-balancing": "round-robin",
+        "timeout": 1,
+        "max-retries": 2
     }
 ]
