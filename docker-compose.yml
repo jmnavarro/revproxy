@@ -7,7 +7,8 @@ services:
       dockerfile: Dockerfile
       context: .
     restart: always
-    ports: 
+    ports:
       - 8080:8080
+      - 9001:9001
     environment:
       - REVPROXY_PROPERTIES=file:///home/gradle/revproxy/conf/application.properties

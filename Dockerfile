@@ -1,6 +1,7 @@
 FROM gradle:jdk21
 
 EXPOSE 8080
+EXPOSE 9001
 ENTRYPOINT [ "java","-jar","/home/gradle/revproxy/build/revproxy.jar" ]
 
 WORKDIR /home/gradle/revproxy
