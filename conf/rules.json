@@ -1,0 +1,21 @@
+[
+    {
+        "from": "127.0.0.1",
+        "to": [
+            "google.com"
+        ],
+        "load-balancing": "random"
+    },
+    {
+        "from": "localhost",
+        "to": [
+            "http://httpbin.org",
+            "https://placebear.com/200/300",
+            "https://placebear.com/500/500",
+            "https://placebear.com/100/500"
+        ],
+        "load-balancing": "round-robin",
+        "timeout": 5,
+        "max-retries": 2
+    }
+]

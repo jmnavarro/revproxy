@@ -1,26 +1,24 @@
 package com.revproxy.service;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.revproxy.model.ProxyDestination;
 import com.revproxy.model.ProxyRule;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.FileCopyUtils;
 
 @Service
 @Slf4j
@@ -33,13 +31,10 @@ public class DestinationServiceImpl implements DestinationService{
     private final Map<String, List<ProxyDestination>> destinations;
 
     public DestinationServiceImpl(@NonNull ResourceLoader resourceLoader, @NonNull LoadBalancerRegistry loadBalancerRegistry) {
-        var rulesFileName = loadRulesFileName(resourceLoader);
-        String rulesFile = rulesFileName.orElse(RULES_FILE);
-
-        log.info(String.format("Rules file used: %s", rulesFile));
-
-        this.destinations = Optional.of(resourceLoader.getResource(rulesFile))
-                .map(DestinationServiceImpl::getResourceAsString)
+        this.destinations = Optional.of(resourceLoader)
+                .flatMap(this::getRulesFileName)
+                .flatMap(makeGetRulesFile(resourceLoader))
+                .map(DestinationServiceImpl::getFileAsString)
                 .map(fileData -> {
                     final var typeToken = new TypeToken<List<ProxyRule>>() {};
                     final List<ProxyRule> origins = new Gson().fromJson(fileData, typeToken.getType());
@@ -57,9 +52,9 @@ public class DestinationServiceImpl implements DestinationService{
                 }).orElse(Collections.emptyMap());
 
         if (this.destinations.isEmpty()) {
-            log.warn(String.format("[%s] No rules found in the configuration file", rulesFile));
+            log.warn("No rules found in the configuration file");
         } else {
-            log.info(String.format("[%s] %d rules found in the configuration file", rulesFile, destinations.size()));
+            log.info(String.format("%d rules found in the configuration file", destinations.size()));
         }
     }
 
@@ -69,9 +64,9 @@ public class DestinationServiceImpl implements DestinationService{
         return (match != null) ? match : Collections.emptyList();
     }
 
-    private static String getResourceAsString(@NonNull Resource resource) {
-        try (Reader reader = new InputStreamReader(resource.getInputStream())) {
-            return FileCopyUtils.copyToString(reader);
+    private static String getFileAsString(@NonNull File file) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(file.getAbsoluteFile().getPath())));
         } catch (IOException e) {
             log.error(e.getLocalizedMessage(), e);
         }
@@ -92,16 +87,34 @@ public class DestinationServiceImpl implements DestinationService{
         return propsFile;
     }
 
-    private Optional<String> loadRulesFileName(@NonNull ResourceLoader resourceLoader) {
+    private Optional<String> getRulesFileName(@NonNull ResourceLoader resourceLoader) {
         try {
             var propsFile = getPropertiesFile();
             var res = resourceLoader.getResource(propsFile);
             Properties p = PropertiesLoaderUtils.loadProperties(res);
             var obj = p.get("revproxy.rules-file");
-            return obj == null ? Optional.empty() : Optional.of(obj.toString());
+            return Optional.of(obj == null ? RULES_FILE : obj.toString());
         } catch (IOException e) {
+            log.error(e.getLocalizedMessage(), e);
             return Optional.empty();
         }
     }
 
+    private Function<String, Optional<File>> makeGetRulesFile(@NonNull ResourceLoader resourceLoader) {
+        return (String rulesFileName) -> {
+            if (rulesFileName.startsWith("classpath:")) {
+                log.warn(String.format("Using internal Rules file: %s", rulesFileName));
+
+                try {
+                    return Optional.of(resourceLoader.getResource(rulesFileName).getFile());
+                } catch (IOException e) {
+                    log.error(e.getLocalizedMessage(), e);
+                    return Optional.empty();
+                }
+            } else {
+                log.info(String.format("External Rules file used: %s", rulesFileName));
+                return Optional.of(new File(rulesFileName.replace("file://","").replace("file:","")));
+            }
+        };
+    }
 }
