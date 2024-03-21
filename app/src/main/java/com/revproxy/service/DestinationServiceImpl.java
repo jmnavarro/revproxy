@@ -26,7 +26,8 @@ import org.springframework.util.FileCopyUtils;
 @Slf4j
 public class DestinationServiceImpl implements DestinationService{
 
-    private static final String RULES_FILE = "rules.json";
+    private static final String PROPS_ENV = "REVPROXY_PROPERTIES";
+    private static final String RULES_FILE = "classpath:rules.json";
 
     @NonNull
     private final Map<String, List<ProxyDestination>> destinations;
@@ -35,7 +36,9 @@ public class DestinationServiceImpl implements DestinationService{
         var rulesFileName = loadRulesFileName(resourceLoader);
         String rulesFile = rulesFileName.orElse(RULES_FILE);
 
-        this.destinations = Optional.of(resourceLoader.getResource("classpath:" + rulesFile))
+        log.info(String.format("Rules file used: %s", rulesFile));
+
+        this.destinations = Optional.of(resourceLoader.getResource(rulesFile))
                 .map(DestinationServiceImpl::getResourceAsString)
                 .map(fileData -> {
                     final var typeToken = new TypeToken<List<ProxyRule>>() {};
@@ -54,9 +57,9 @@ public class DestinationServiceImpl implements DestinationService{
                 }).orElse(Collections.emptyMap());
 
         if (this.destinations.isEmpty()) {
-            log.warn(String.format("[%s] No origins found in the configuration file", rulesFile));
+            log.warn(String.format("[%s] No rules found in the configuration file", rulesFile));
         } else {
-            log.info(String.format("[%s] %d origins found in the configuration file", rulesFile, destinations.size()));
+            log.info(String.format("[%s] %d rules found in the configuration file", rulesFile, destinations.size()));
         }
     }
 
@@ -80,9 +83,19 @@ public class DestinationServiceImpl implements DestinationService{
         return (parts.length > 0) ? parts[0] : hostWithPort;
     }
 
+    private String getPropertiesFile() {
+        var propsFileEnv = System.getenv(PROPS_ENV);
+        var propsFile = propsFileEnv == null ? "classpath:application.properties" : propsFileEnv;
+
+        log.info(String.format("Properties file used: %s", propsFile));
+
+        return propsFile;
+    }
+
     private Optional<String> loadRulesFileName(@NonNull ResourceLoader resourceLoader) {
         try {
-            var res = resourceLoader.getResource("classpath:application.properties");
+            var propsFile = getPropertiesFile();
+            var res = resourceLoader.getResource(propsFile);
             Properties p = PropertiesLoaderUtils.loadProperties(res);
             var obj = p.get("revproxy.rules-file");
             return obj == null ? Optional.empty() : Optional.of(obj.toString());
