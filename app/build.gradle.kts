@@ -25,6 +25,7 @@ dependencies {
     // The main reason is that a threaded server requires an open thread during the complete lifetime
     // of each request, leading to higher resources consumption and less scalability.
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     implementation("com.google.code.gson:gson:2.10.1")
 
