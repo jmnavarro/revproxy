@@ -110,7 +110,7 @@ tolerations: []
 
 affinity: {}
 
-
 env:
-  normal:
-    REVPROXY_PROPERTIES: file:///home/gradle/revproxy/conf/application.properties
+  REVPROXY_PROPERTIES: file:///home/gradle/revproxy/conf/application.properties
+  SERVER_ADDRESS: 0.0.0.0
+

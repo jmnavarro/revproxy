@@ -44,6 +44,11 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+          env:
+            - name: REVPROXY_PROPERTIES
+              value: {{ .Values.env.REVPROXY_PROPERTIES }}
+            - name: SERVER_ADDRESS
+              value: {{ .Values.env.SERVER_ADDRESS }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}
