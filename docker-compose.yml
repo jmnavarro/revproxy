@@ -11,4 +11,5 @@ services:
       - 8080:8080
       - 9001:9001
     environment:
+      - SERVER_ADDRESS=0.0.0.0
       - REVPROXY_PROPERTIES=file:///home/gradle/revproxy/conf/application.properties
