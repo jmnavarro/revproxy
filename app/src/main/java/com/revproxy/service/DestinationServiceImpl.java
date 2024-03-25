@@ -55,6 +55,9 @@ public class DestinationServiceImpl implements DestinationService{
             log.warn("No rules found in the configuration file");
         } else {
             log.info(String.format("%d rules found in the configuration file", destinations.size()));
+            for (var e : destinations.entrySet()) {
+                e.getValue().stream().map(d -> String.format("  - %s\n", d.toString())).forEach(log::info);
+            }
         }
     }
 

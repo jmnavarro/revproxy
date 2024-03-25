@@ -33,4 +33,9 @@ public record ProxyDestination(
         @Nullable
         int maxRetries
 ) {
+        @Override
+        public String toString() {
+                return String.format("[from=%s to=%s loadBalancerName=%s loadBalancer=%s timeout=%d maxRetries=%d]",
+                        from, to, loadBalancerName, loadBalancer, timeout, maxRetries);
+        }
 }
